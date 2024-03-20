@@ -1,4 +1,10 @@
-<!doctype html>
+{% extends "layout.html" %}
+{% block title %}Bug Creation Form{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block pagetitle %}<p>Bug Creation Form</p>{% endblock %}
+{% block content %}
 <title>Make Bug</title>
 <form method="post">
     <label for="reportNum">Report #:</label><br>
@@ -19,3 +25,4 @@
 <button>Save & Exit</button>
 <button>SUBMIT</button>
 <button>Close</button>
+{% endblock %}

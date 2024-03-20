@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Registration{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block pagetitle %}<p>Register</p>{% endblock %}
+{% block content %}
+<title>Log In Screen</title>
+<form method="post">
+    <label for="userID">userID:</label><br>
+    <input type="text" id="userID" name="userID" value="{{ request.form['userID'] }}"><br>
+    <label for="username">username:</label><br>
+    <input type="text" id="username" name="username" value="{{ request.form['username'] }}"><br>
+    <label for="password">password:</label><br>
+    <input type="password" id="password" name="password" value="{{ request.form['password'] }}">
+    <button type="submit">SUBMIT</button>
+  </form> 
+{% endblock %}

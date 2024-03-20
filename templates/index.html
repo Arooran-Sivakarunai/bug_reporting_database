@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block pagetitle %}<p>Home</p>{% endblock %}
+{% block content %}
+    {% if logged_in %}
+    <div>
+        <button>Make New Bug</button>
+        <button>My Bugs</button>
+        <button>Sprint Graph</button>
+        <button>Bug Library</button>
+        <button>Log Out</button>
+    </div>
+    {% else %}
+    <div>
+        <a href="{{ url_for('create') }}">
+            <button>New User?</button>
+        </a>
+        <button>Log IN</button>
+    </div>
+    {% endif %}
+{% endblock %}
