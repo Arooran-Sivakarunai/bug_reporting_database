@@ -11,7 +11,13 @@
         <h1>Bug Reporting Database</h1>
         <p>{% block pagetitle %}{% endblock %}</p>
     </div>
-    <div id="content">{% block content %}{% endblock %}</div>
+    <div class="content">
+      {% for message in get_flashed_messages() %}
+          <div class="alert">{{ message }}</div>
+      {% endfor %}
+
+      {% block content %} {% endblock %}
+  </div>
     <div id="footer">
       {% block footer %}
       <p>This is the footer</p>.

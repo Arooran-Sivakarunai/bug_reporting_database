@@ -5,7 +5,7 @@
 {% endblock %}
 {% block pagetitle %}<p>Home</p>{% endblock %}
 {% block content %}
-    {% if logged_in %}
+    {% if user %}
     <div>
         <button>Make New Bug</button>
         <button>My Bugs</button>
@@ -18,7 +18,9 @@
         <a href="{{ url_for('create') }}">
             <button>New User?</button>
         </a>
-        <button>Log IN</button>
+        <a href="{{ url_for('login') }}">
+            <button>Log IN</button>
+        </a>
     </div>
     {% endif %}
 {% endblock %}
