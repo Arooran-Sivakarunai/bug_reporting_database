@@ -64,7 +64,7 @@ def login():
                     global user 
                     user = get_user_login(username, p.get_password_hash(password))
                     if(user != None):
-                        return redirect(url_for('index', user=user))
+                        return redirect(url_for('index'))
                     else:
                         flash('Either Username or Password is Incorrect')
     except:
