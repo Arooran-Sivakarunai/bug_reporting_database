@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, g
+from flask_mail import Mail, Message
 import sqlite3
 import os
 import passwords as p
-
 
 DATABASE = './databases/main.db'
 user = None
