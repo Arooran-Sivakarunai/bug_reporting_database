@@ -7,6 +7,8 @@ import bugs as b
 
 DATABASE = './databases/main.db'
 user = None
+bug_id = None
+
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -87,14 +89,14 @@ def make_new_bug():
             return redirect(url_for('index', user=user))
         if request.form.get("Save"):
             try:
-                save_to_temp(request.form, user, False)
+                save_to_temp(request.form, user, 0)
                 return redirect(url_for('my_bugs'))
             except Exception as e:
                 print(e)
                 return redirect(url_for('index'))
         if request.form.get("Submit"):
             try:
-                save_to_main(request.form, user, False)
+                save_to_main(request.form, user, 0)
                 return redirect(url_for('my_bugs'))
             except b.InvalidBugTitle:
                 flash("You must input a bug title")
@@ -106,10 +108,46 @@ def make_new_bug():
                 print('uh oh', e)
     return render_template("make_bug.html")
 
-@app.route("/my_bugs")
+@app.route("/my_bugs", methods=('GET','POST'))
 def my_bugs():
-    print(user)
+    if request.method == 'POST':
+        if request.form.get("edit_unsaved"):
+            global bug_id
+            bug_id = request.form.get("edit_unsaved")
+            return redirect(url_for('edit_unsaved_bugs'))
     return render_template('my_bugs.html', unfinished_bugs=get_unfinished_bugs(user.user_id), finished_bugs=get_finished_bugs(user.user_id))
+
+@app.route('/edit_unsaved_bugs', methods=('GET','POST'))
+def edit_unsaved_bugs():
+    global user
+    global bug_id
+    bug = get_unsaved_bugid(int(bug_id))
+    print(bug)
+    if request.method == 'POST':
+        print(request.form)
+        if request.form.get("Cancel"):
+            return redirect(url_for('index', user=user))
+        if request.form.get("Save"):
+            try:
+                save_to_temp(request.form, user, int(bug_id))
+                return redirect(url_for('my_bugs'))
+            except Exception as e:
+                print(e)
+                return redirect(url_for('index'))
+        if request.form.get("Submit"):
+            try:
+                save_to_main(request.form, user, int(bug_id))
+                return redirect(url_for('my_bugs'))
+            except b.InvalidBugTitle:
+                flash("You must input a bug title")
+            except b.InvalidBugSummary:
+                flash("You must input a bug summary")
+            except b.InvalidPriority:
+                flash("You must input a bug priority")
+            except Exception as e:
+                print('uh oh', e)
+    return render_template("edit_unsaved_bug.html", bug=bug)
+
 
 @app.route("/forgotpassword")
 def forgot_password():
@@ -183,6 +221,18 @@ def get_unfinished_bugs(uID: int):
     
     return final
 
+def get_unsaved_bugid(uID: int):
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM temp_reports WHERE bug_id == ?"""
+    res = cur.execute(query, (uID,)).fetchall()
+    final = []
+    for bug in res:
+        print(bug)
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final[0]
+
 def get_finished_bugs(uID: int):
     conn = get_db()
     cur = conn.cursor()
@@ -199,8 +249,17 @@ def save_to_temp(rForm, user, is_in_db):
     conn = get_db()
     cur = conn.cursor()
     try:
-        if(is_in_db):
-            print(rForm)
+        if(is_in_db != 0):
+            query = f"""UPDATE temp_reports
+            SET bug_title= ?,
+            bug_summary=?,
+            priority= ?
+            WHERE
+            bug_id = ?"""
+            
+            new_info = (rForm.get("bug_title"), rForm.get("bug_info"), rForm.get("options"), is_in_db)
+            cur.execute(query, new_info)
+            conn.commit()
         else:
             query = f"INSERT INTO temp_reports (user_id, date, bug_title, bug_summary, priority, notify) VALUES (?, ?, ?, ?, ?, ?)"
             bug = b.make_new_bugs(rForm, user.user_id)[1:]
@@ -214,8 +273,13 @@ def save_to_temp(rForm, user, is_in_db):
 def save_to_main(rForm, user, is_in_db):
     conn = get_db()
     cur = conn.cursor()
-    if(is_in_db):
-        print(rForm)
+    if(is_in_db != 0):
+        query = f"""DELETE FROM temp_reports WHERE bug_id = ?"""
+        
+        
+        cur.execute(query, (is_in_db,))
+        conn.commit()
+        save_to_main(rForm, user, 0)
     else:
         query = f"INSERT INTO main_reports (user_id, date, bug_title, bug_summary, priority, notify) VALUES (?, ?, ?, ?, ?, ?)"
         bug = b.make_new_bugs_complete(rForm, user.user_id)[1:]
