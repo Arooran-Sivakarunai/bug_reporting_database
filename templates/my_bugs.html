@@ -9,6 +9,10 @@
 {%for bug in unfinished_bugs %} 
   <li>{{ bug.bug_title }} + {{ bug.bug_id }}</li> 
 {%endfor%} 
+<p>Finished Bugs</p>
+{%for bug in finished_bugs %} 
+  <li>{{ bug.bug_title }} + {{ bug.bug_id }}</li> 
+{%endfor%}
 <a href="{{ url_for('index') }}">
   <button>Home</button>
 </a>

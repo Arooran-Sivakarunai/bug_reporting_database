@@ -21,6 +21,12 @@ app.config['SECRET_KEY'] = os.urandom(24).hex()
 def index():
     return render_template("index.html", user=user)
 
+@app.route('/logout')
+def logout():
+    global user
+    user = None
+    return render_template("index.html", user=None)
+
 @app.route('/createuser', methods=('GET','POST'))
 def create():
     try:
@@ -74,39 +80,36 @@ def login():
 
 @app.route('/make_new_bug', methods=('GET','POST'))
 def make_new_bug():
-    try:
-        if request.method == 'POST':
-            if request.form.get("Cancel"):
-                return redirect(url_for('index', user=user))
-            if request.form.get("Save"):
-                try:
-                    save_to_temp(request.form, user, False)
-                    return redirect(url_for('my_bugs'))
-                except Exception as e:
-                    print(e)
-                    return redirect(url_for('index'))
-            # if request.form.get("Log In"):
-            #     username = request.form['username']
-            #     password = request.form['password']
-            #     if not username:
-            #         flash('username is required!')
-            #     elif not password:
-            #         flash('Password is not strong enough!')
-            #     else:
-            #         global user 
-            #         user = get_user_login(username, u.User.get_password_hash(password))
-            #         if(user != None):
-            #             return redirect(url_for('index'))
-            #         else:
-            #             flash('Either Username or Password is Incorrect')
-    except Exception as e:
-        print('uh oh', e)
+    global user 
+    if request.method == 'POST':
+        print(request.form)
+        if request.form.get("Cancel"):
+            return redirect(url_for('index', user=user))
+        if request.form.get("Save"):
+            try:
+                save_to_temp(request.form, user, False)
+                return redirect(url_for('my_bugs'))
+            except Exception as e:
+                print(e)
+                return redirect(url_for('index'))
+        if request.form.get("Submit"):
+            try:
+                save_to_main(request.form, user, False)
+                return redirect(url_for('my_bugs'))
+            except b.InvalidBugTitle:
+                flash("You must input a bug title")
+            except b.InvalidBugSummary:
+                flash("You must input a bug summary")
+            except b.InvalidPriority:
+                flash("You must input a bug priority")
+            except Exception as e:
+                print('uh oh', e)
     return render_template("make_bug.html")
 
 @app.route("/my_bugs")
 def my_bugs():
     print(user)
-    return render_template('my_bugs.html', unfinished_bugs=get_unfinished_bugs(user.user_id))
+    return render_template('my_bugs.html', unfinished_bugs=get_unfinished_bugs(user.user_id), finished_bugs=get_finished_bugs(user.user_id))
 
 @app.route("/forgotpassword")
 def forgot_password():
@@ -172,7 +175,18 @@ def get_unfinished_bugs(uID: int):
     conn = get_db()
     cur = conn.cursor()
     query = f"""SELECT * FROM temp_reports WHERE user_id == ?"""
-    print(uID)
+    res = cur.execute(query, (uID,)).fetchall()
+    final = []
+    for bug in res:
+        print(bug)
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final
+
+def get_finished_bugs(uID: int):
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM main_reports WHERE user_id == ?"""
     res = cur.execute(query, (uID,)).fetchall()
     final = []
     for bug in res:
@@ -195,4 +209,17 @@ def save_to_temp(rForm, user, is_in_db):
             
     except Exception as e:
         print(e)
+    conn.close()
+    
+def save_to_main(rForm, user, is_in_db):
+    conn = get_db()
+    cur = conn.cursor()
+    if(is_in_db):
+        print(rForm)
+    else:
+        query = f"INSERT INTO main_reports (user_id, date, bug_title, bug_summary, priority, notify) VALUES (?, ?, ?, ?, ?, ?)"
+        bug = b.make_new_bugs_complete(rForm, user.user_id)[1:]
+        print(bug)
+        cur.execute(query, bug)
+        conn.commit()
     conn.close()

@@ -15,7 +15,9 @@
         </a>
         <button>Sprint Graph</button>
         <button>Bug Library</button>
-        <button>Log Out</button>
+        <a href="{{ url_for('logout') }}">
+            <button>Log Out</button>
+        </a>
     </div>
     {% else %}
     <div>
