@@ -3,6 +3,7 @@ from flask_mail import Mail, Message
 import sqlite3
 import os
 import users as u
+import bugs as b
 
 DATABASE = './databases/main.db'
 user = None
@@ -41,7 +42,7 @@ def create():
     except u.UserIDTaken:
         flash("UserId already has Associated Account")
     except Exception as e:
-        print(e)
+        # print(e)
         flash("Something Went Terribly Wrong")
     return render_template("create_user.html")
 
@@ -67,9 +68,45 @@ def login():
                         return redirect(url_for('index'))
                     else:
                         flash('Either Username or Password is Incorrect')
-    except:
-        print('uh oh')
+    except Exception as e:
+        print('uh oh', e)
     return render_template("log_in.html")
+
+@app.route('/make_new_bug', methods=('GET','POST'))
+def make_new_bug():
+    try:
+        if request.method == 'POST':
+            if request.form.get("Cancel"):
+                return redirect(url_for('index', user=user))
+            if request.form.get("Save"):
+                try:
+                    save_to_temp(request.form, user, False)
+                    return redirect(url_for('my_bugs'))
+                except Exception as e:
+                    print(e)
+                    return redirect(url_for('index'))
+            # if request.form.get("Log In"):
+            #     username = request.form['username']
+            #     password = request.form['password']
+            #     if not username:
+            #         flash('username is required!')
+            #     elif not password:
+            #         flash('Password is not strong enough!')
+            #     else:
+            #         global user 
+            #         user = get_user_login(username, u.User.get_password_hash(password))
+            #         if(user != None):
+            #             return redirect(url_for('index'))
+            #         else:
+            #             flash('Either Username or Password is Incorrect')
+    except Exception as e:
+        print('uh oh', e)
+    return render_template("make_bug.html")
+
+@app.route("/my_bugs")
+def my_bugs():
+    print(user)
+    return render_template('my_bugs.html', unfinished_bugs=get_unfinished_bugs(user.user_id))
 
 @app.route("/forgotpassword")
 def forgot_password():
@@ -131,3 +168,31 @@ def get_user_login(user: str, password: str) -> any:
     except:
         return None
         
+def get_unfinished_bugs(uID: int):
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM temp_reports WHERE user_id == ?"""
+    print(uID)
+    res = cur.execute(query, (uID,)).fetchall()
+    final = []
+    for bug in res:
+        print(bug)
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final
+
+def save_to_temp(rForm, user, is_in_db):
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        if(is_in_db):
+            print(rForm)
+        else:
+            query = f"INSERT INTO temp_reports (user_id, date, bug_title, bug_summary, priority, notify) VALUES (?, ?, ?, ?, ?, ?)"
+            bug = b.make_new_bugs(rForm, user.user_id)[1:]
+            cur.execute(query, bug)
+            conn.commit()
+            
+    except Exception as e:
+        print(e)
+    conn.close()

@@ -7,8 +7,12 @@
 {% block content %}
     {% if user %}
     <div>
-        <button>Make New Bug</button>
-        <button>My Bugs</button>
+        <a href="{{ url_for('make_new_bug') }}">
+            <button>Make New Bug</button>
+        </a>
+        <a href="{{ url_for('my_bugs') }}">
+            <button>My Bugs</button>
+        </a>
         <button>Sprint Graph</button>
         <button>Bug Library</button>
         <button>Log Out</button>

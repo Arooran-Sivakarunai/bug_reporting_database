@@ -15,13 +15,10 @@ def create_app():
     mail.init_app(app)
 
     @app.route("/", methods=['GET', 'POST'])
-
-
     def index():
         return render_template("forgot_username.html")
     
     @app.route("/send_username", methods=["POST"])
-
     def send_username():
         email = request.form.get("email")
 

@@ -13,16 +13,26 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 );
 
-CREATE TABLE IF NOT EXISTS reports (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    reportNum INTEGER,
-    bugType TEXT,
-    bugSummary TEXT,
+CREATE TABLE IF NOT EXISTS temp_reports (
+    bug_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,`
+    bug_title TEXT NOT NULL,
+    bug_summary TEXT NOT NULL,
     updateNotifs TEXT,
     updateProgress TEXT,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 """
+# CREATE TABLE IF NOT EXISTS temp_reports (
+#     bug_id INTEGER PRIMARY KEY AUTOINCREMENT,
+#     user_id INTEGER,
+#     date int,
+#     bug_title TEXT,
+#     bug_summary TEXT,
+#     priority TEXT CHECK( priority IN ('Low','Medium','High') ),
+#     notify int CHECK( notify IN (0, 1))
+# );
+
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -64,7 +74,6 @@ def insert_report():
         return 'Report submitted successfully!', 'success'
     except Exception as e:
         return f'An error occurred: {str(e)}', 'error'
-
     return redirect(url_for('report_form'))
 
 if __name__ == "__main__":

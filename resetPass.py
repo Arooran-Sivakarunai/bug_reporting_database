@@ -13,13 +13,11 @@ def create_app():
     app.config["MAIL_USE_SSL"] = True
 
     mail.init_app(app)
-
     @app.route("/")
 
     # check to see if provided email is in the database
     # if it is, send link with update_password.html form 
     # else, return "Account does not exist."
-    
 
     def index():
         msg = Message (
