@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, g
 from flask_mail import Mail, Message
 import sqlite3
+from datetime import date
 import os
 import users as u
 import bugs as b
@@ -111,10 +112,14 @@ def make_new_bug():
 @app.route("/my_bugs", methods=('GET','POST'))
 def my_bugs():
     if request.method == 'POST':
+        global bug_id
         if request.form.get("edit_unsaved"):
-            global bug_id
             bug_id = request.form.get("edit_unsaved")
             return redirect(url_for('edit_unsaved_bugs'))
+        if request.form.get("edit_saved"):
+            bug_id = request.form.get("edit_saved")
+            return redirect(url_for('edit_saved_bugs'))
+            
     return render_template('my_bugs.html', unfinished_bugs=get_unfinished_bugs(user.user_id), finished_bugs=get_finished_bugs(user.user_id))
 
 @app.route('/edit_unsaved_bugs', methods=('GET','POST'))
@@ -122,7 +127,6 @@ def edit_unsaved_bugs():
     global user
     global bug_id
     bug = get_unsaved_bugid(int(bug_id))
-    print(bug)
     if request.method == 'POST':
         print(request.form)
         if request.form.get("Cancel"):
@@ -148,10 +152,37 @@ def edit_unsaved_bugs():
                 print('uh oh', e)
     return render_template("edit_unsaved_bug.html", bug=bug)
 
+@app.route('/edit_saved_bugs', methods=('GET','POST'))
+def edit_saved_bugs():
+    global user
+    global bug_id
+    bug = get_saved_bugid(int(bug_id))
+    if request.method == 'POST':
+        if request.form.get("Cancel"):
+            return redirect(url_for('index', user=user))
+        if request.form.get("Save"):
+            try:
+                update_priority(request.form, user, int(bug_id))
+                return redirect(url_for('my_bugs'))
+            except Exception as e:
+                print(e)
+                return redirect(url_for('index'))
+    return render_template("edit_saved_bug.html", bug=bug)
+
+@app.route("/bug_library",  methods=('GET','POST'))
+def bug_library():
+    bugs = get_all_bugs()
+    if request.method == "POST":
+        print(bugs)
+    return render_template("bug_library.html", bugs=bugs)
 
 @app.route("/forgotpassword")
 def forgot_password():
     return render_template("forgot_password.html")
+
+@app.route("/sprint_data")
+def sprint_data():
+    return render_template("sprint.html")
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -233,6 +264,17 @@ def get_unsaved_bugid(uID: int):
     
     return final[0]
 
+def get_saved_bugid(uID: int):
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM main_reports WHERE bug_id == ?"""
+    res = cur.execute(query, (uID,)).fetchall()
+    final = []
+    for bug in res:
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final[0]
+
 def get_finished_bugs(uID: int):
     conn = get_db()
     cur = conn.cursor()
@@ -241,6 +283,17 @@ def get_finished_bugs(uID: int):
     final = []
     for bug in res:
         print(bug)
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final
+
+def get_all_bugs():
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM main_reports"""
+    res = cur.execute(query).fetchall()
+    final = []
+    for bug in res:
         final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
     
     return final
@@ -286,4 +339,25 @@ def save_to_main(rForm, user, is_in_db):
         print(bug)
         cur.execute(query, bug)
         conn.commit()
+    conn.close()
+    
+def update_priority(rForm, user, bug_id):
+    conn = get_db()
+    cur = conn.cursor()
+    if rForm.get("options") != "Complete":
+        query = f"""UPDATE main_reports
+                SET priority= ?
+                WHERE
+                bug_id = ?"""
+        info = (rForm.get("options"),bug_id)
+    else:
+        query = f"""UPDATE main_reports
+                SET priority= ?,
+                date = ?
+                WHERE
+                bug_id = ?"""
+        info = (rForm.get("options"), date.today(), bug_id)
+        print("yay")
+    cur.execute(query, info)
+    conn.commit()
     conn.close()

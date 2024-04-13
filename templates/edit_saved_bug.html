@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Bug Creation Form{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block pagetitle %}<p>Bug Creation Form</p>{% endblock %}
+{% block content %}
+<title>Create Bugs</title>
+    <form method="post">
+        <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p>
+        <p>{{ bug.bug_summary }}</p>
+
+        <p>Priority?</p>
+        <input type="radio" name="options" id="Low" value="Low" {% if bug.priority == 'Low' %}checked{% endif %}> Low </input>
+        <input type="radio" name="options" id="Medium" value="Medium" {% if bug.priority == 'Medium' %}checked{% endif %}> Medium </input>
+        <input type="radio" name="options" id="High" value="High" {% if bug.priority == 'High' %}checked{% endif %}> High </input>
+        <input type="radio" name="options" id="Completed" value="Complete" {% if bug.priority == 'Complete' %}checked{% endif %}> Complete </input>
+        <br>
+
+        <button type="submit" name="Save" value="Save & Exit">Save & Exit</button>
+        <button type="submit" name="Cancel" value="Cancel">Cancel</button>
+    </form>
+{% endblock %}

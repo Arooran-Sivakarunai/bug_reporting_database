@@ -13,8 +13,12 @@
         <a href="{{ url_for('my_bugs') }}">
             <button>My Bugs</button>
         </a>
-        <button>Sprint Graph</button>
-        <button>Bug Library</button>
+        <a href="{{ url_for('sprint_data') }}">
+            <button>Sprint Data</button>
+        </a>
+        <a href="{{ url_for('bug_library') }}">
+            <button>Bug Library</button>
+        </a>
         <a href="{{ url_for('logout') }}">
             <button>Log Out</button>
         </a>
