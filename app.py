@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, url_for, flash, redirect, g
-from flask_mail import Mail, Message
+from flask import Flask, render_template, request, url_for, flash, redirect, g, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_mail import *
 import sqlite3
 from datetime import date
 import os
@@ -9,6 +10,7 @@ import bugs as b
 DATABASE = './databases/main.db'
 user = None
 bug_id = None
+mail = Mail()
 
 
 def get_db():
@@ -19,6 +21,14 @@ def get_db():
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24).hex()
+app = Flask(__name__)
+app.config["MAIL_SERVER"] = "smtp.fastmail.com"
+app.config["MAIL_PORT"] = 465
+app.config["MAIL_USERNAME"] = "dummy123@fastmail.com"
+app.config["MAIL_PASSWORD"] = "7vk78zb6yj2cykwu"
+app.config["MAIL_USE_TLS"] = False
+app.config["MAIL_USE_SSL"] = True
+mail.init_app(app)
 
 @app.route("/")
 def index():
@@ -62,7 +72,9 @@ def login():
             if request.form.get("Cancel"):
                 return redirect(url_for('index', user=None))
             if request.form.get("Forgot Password"):
-                return redirect(url_for('forgot_password'))
+                return redirect(url_for('send_password'))
+            if request.form.get("Forgot Username"):
+                return redirect(url_for('send_username'))
             if request.form.get("Log In"):
                 username = request.form['username']
                 password = request.form['password']
@@ -176,9 +188,49 @@ def bug_library():
         print(bugs)
     return render_template("bug_library.html", bugs=bugs)
 
-@app.route("/forgotpassword")
-def forgot_password():
+@app.route("/send_password", methods=('GET','POST'))
+def send_password():
+    if request.method == "POST":
+        print("yay")
+        email = request.form.get("email")
+        if email: 
+            msg = Message (
+            'Password Reset', 
+            sender = 'dummy123@fastmail.com',
+            recipients=["dummy123@fastmail.com", email] 
+            )
+            msg.body = "We have recieved your request for a Password reset. An admin will contact you shortly"
+        
+            with app.app_context():
+                mail.send(msg)
+            return "Request Sent. Please check your mail."
+        else: 
+            return "Account does not exist."
+
     return render_template("forgot_password.html")
+
+@app.route("/send_username", methods=["POST", "GET"])
+def send_username():
+    if request.method == "POST":
+        email = request.form.get("email")
+        if email: 
+
+            msg = Message (
+            'Username Reset', 
+            sender = 'dummy123@fastmail.com',
+            recipients=["dummy123@fastmail.com", email] 
+            )
+            msg.body = "We have recieved your request for a username reset. An admin will contact you shortly"
+        
+            with app.app_context():
+                mail.send(msg)
+            return "Username Sent. Please check your mail."
+        else: 
+            return "Account does not exist."
+
+    return render_template("forgot_username.html")
+
+
 
 @app.route("/sprint_data")
 def sprint_data():
