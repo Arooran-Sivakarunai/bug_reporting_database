@@ -182,7 +182,9 @@ def forgot_password():
 
 @app.route("/sprint_data")
 def sprint_data():
-    return render_template("sprint.html")
+    complete_bugs = get_complete_bugs()
+    non_complete_bugs = get_non_complete_bugs()
+    return render_template("sprint.html", completeNum=len(complete_bugs), nonCompleteNum=len(non_complete_bugs), complete_bugs=complete_bugs,non_complete_bugs=non_complete_bugs)
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -291,6 +293,30 @@ def get_all_bugs():
     conn = get_db()
     cur = conn.cursor()
     query = f"""SELECT * FROM main_reports"""
+    res = cur.execute(query).fetchall()
+    final = []
+    for bug in res:
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final
+
+def get_complete_bugs():
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM main_reports WHERE priority = 'Complete' AND date >= date('now', '-7 days');
+"""
+    res = cur.execute(query).fetchall()
+    final = []
+    for bug in res:
+        final.append(b.Bug(bug_id=bug[0],user_id=bug[1],date=bug[2],bug_title=bug[3],bug_summary=bug[4],priority=bug[5],notify=bug[6]))
+    
+    return final
+
+def get_non_complete_bugs():
+    conn = get_db()
+    cur = conn.cursor()
+    query = f"""SELECT * FROM main_reports WHERE priority != 'Complete' AND date >= date('now', '-7 days');
+"""
     res = cur.execute(query).fetchall()
     final = []
     for bug in res:

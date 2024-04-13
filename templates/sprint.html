@@ -5,19 +5,21 @@
 {% endblock %}
 {% block pagetitle %}<p>Bug Library</p>{% endblock %}
 {% block content %}
-  {%for bug in new_bugs %}
+  <p>Complete #: {{completeNum}}</p>
+  <p>Non-Complete #: {{nonCompleteNum}}</p>
+  {%for bug in non_complete_bugs %}
   <div id="a_bug">
     <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p>
     <p>{{ bug.bug_summary }}</p>
     <p>{{ bug.priority }}</p>
   </div> 
   {%endfor%}
-
-  {%for bug in completed_bugs %}
+  <br>
+  <p>COMPLETED</p>
+  {%for bug in complete_bugs %}
   <div id="a_bug">
     <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p>
     <p>{{ bug.bug_summary }}</p>
-    <p>{{ bug.priority }}</p>
   </div> 
   {%endfor%}
 {% endblock %}

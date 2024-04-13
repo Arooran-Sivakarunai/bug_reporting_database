@@ -11,7 +11,6 @@ class UserCredentials(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
 
 @app.route('/check_email', methods=['GET','POST'])
-
 def check_email():
 
     if request.method == 'GET':
