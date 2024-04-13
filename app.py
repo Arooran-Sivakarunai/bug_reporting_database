@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, g, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_mail import *
 import sqlite3
 from datetime import date

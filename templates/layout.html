@@ -10,17 +10,27 @@
   {% endblock %}
 </head>
 <body>
-  <div id="logo">
-    <h1>Bug Reporting Database</h1>
-    <p>{% block pagetitle %}{% endblock %}</p>
-  </div>
-
-  <div id="toggle">
+  <div class="title">
+    <div id="toggle">
+      <h1 id="head">Bug Reporting Database</h1>
+    </div>
+    <div class="logo">
+      <img src="/static/images/ladybug.png" alt="ladybug" id="ladybug">
+      <img src="/static/images/glass.png" alt="glass" id="glass">
+    </div>
+    <br>
+    <br>
     <label class="switch">
       <input type="checkbox" id="themeToggle" onclick="myFunction()">
       <span class="slider round"></span>
     </label>
-  </div>
+    <br>
+    <br>
+    <div class="home">
+      <a href="{{ url_for('index') }}">Home</a>
+    </div>
+  </div>  
+
 
   <div class="content">
     {% for message in get_flashed_messages() %}
@@ -30,7 +40,6 @@
   </div>
   <div id="footer">
     {% block footer %}
-    <p>This is the footer.</p>
     {% endblock %}
   </div>
 </body>
