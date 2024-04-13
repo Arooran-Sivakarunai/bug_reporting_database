@@ -7,11 +7,21 @@
 {% block content %}
     {% if user %}
     <div>
-        <button>Make New Bug</button>
-        <button>My Bugs</button>
-        <button>Sprint Graph</button>
-        <button>Bug Library</button>
-        <button>Log Out</button>
+        <a href="{{ url_for('make_new_bug') }}">
+            <button>Make New Bug</button>
+        </a>
+        <a href="{{ url_for('my_bugs') }}">
+            <button>My Bugs</button>
+        </a>
+        <a href="{{ url_for('sprint_data') }}">
+            <button>Sprint Data</button>
+        </a>
+        <a href="{{ url_for('bug_library') }}">
+            <button>Bug Library</button>
+        </a>
+        <a href="{{ url_for('logout') }}">
+            <button>Log Out</button>
+        </a>
     </div>
     {% else %}
     <div>

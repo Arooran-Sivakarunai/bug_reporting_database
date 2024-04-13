@@ -1,9 +1,22 @@
 {% extends "layout.html" %}
-{% block title %}Username reset{% endblock %}
+{% block title %}Password reset{% endblock %}
 {% block head %}
   {{ super() }}
 {% endblock %}
 {% block pagetitle %}<p>Forgot Username?</p>{% endblock %}
 {% block content %}
-    <p>Add This Functionality Later</p>
+<form method="post" action="/send_username" style="display: flex;">
+  <div style="margin-right: 10px;">
+      <label for="email"> Enter Email Associated with Account: </label>
+      <input type="email" id="email" name="email">
+  </div><br>
+
+  <div class="submit">
+      <input type="submit" value="SUBMIT">
+  </div>
+</form>
+
+
+<!-- If the email is in the database, username in plain text will be sent! -->
+<!-- If not, label will pop up saying, "Account does not exist."-->
 {% endblock %}

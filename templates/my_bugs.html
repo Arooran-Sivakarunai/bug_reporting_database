@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Bug Creation Form{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block pagetitle %}<p>My Bugs</p>{% endblock %}
+{% block content %}
+<title>My Bugs</title>
+<a href="{{ url_for('index') }}">
+  <button>Home</button>
+</a>
+<form method="post">
+{%for bug in unfinished_bugs %} 
+  <button type="submit" name="edit_unsaved" value="{{ bug.bug_id }}">Edit</button>
+  <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p> 
+{%endfor%} 
+<p>Finished Bugs</p>
+{%for bug in finished_bugs %}
+  <button type="submit" name="edit_saved" value="{{ bug.bug_id }}">Edit</button>
+  <li>{{ bug.bug_title }} + {{ bug.bug_id }}</li> 
+{%endfor%}
+</form>
+{% endblock %}

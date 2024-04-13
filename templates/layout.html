@@ -1,27 +1,46 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>{% block title %}{% endblock %} - BUG REPORTING DATABASE</title>
-    {% endblock %}
-  </head>
-  <body>
-    <div id="Logo">
-        <h1>Bug Reporting Database</h1>
-        <p>{% block pagetitle %}{% endblock %}</p>
+<head>
+  {% block head %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
+  <title>{% block title %}BUG REPORTING DATABASE{% endblock %}</title>
+  <script src="{{ url_for('static', filename='/js/darkmode.js') }}"></script>
+  {% endblock %}
+</head>
+<body>
+  <div class="title">
+    <div id="toggle">
+      <h1 id="head">Bug Reporting Database</h1>
     </div>
-    <div class="content">
-      {% for message in get_flashed_messages() %}
-          <div class="alert">{{ message }}</div>
-      {% endfor %}
+    <div class="logo">
+      <img src="/static/images/ladybug.png" alt="ladybug" id="ladybug">
+      <img src="/static/images/glass.png" alt="glass" id="glass">
+    </div>
+    <br>
+    <br>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle" onclick="myFunction()">
+      <span class="slider round"></span>
+    </label>
+    <br>
+    <br>
+    <div class="home">
+      <a href="{{ url_for('index') }}">Home</a>
+    </div>
+  </div>  
 
-      {% block content %} {% endblock %}
+
+  <div class="content">
+    {% for message in get_flashed_messages() %}
+    <div class="alert">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
   </div>
-    <div id="footer">
-      {% block footer %}
-      <p>This is the footer</p>.
-      {% endblock %}
-    </div>
-  </body>
+  <div id="footer">
+    {% block footer %}
+    {% endblock %}
+  </div>
+</body>
 </html>

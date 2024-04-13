@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Bug Library{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block pagetitle %}<p>Bug Library</p>{% endblock %}
+{% block content %}
+  <p>Complete #: {{completeNum}}</p>
+  <p>Non-Complete #: {{nonCompleteNum}}</p>
+  {%for bug in non_complete_bugs %}
+  <div id="a_bug">
+    <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p>
+    <p>{{ bug.bug_summary }}</p>
+    <p>{{ bug.priority }}</p>
+  </div> 
+  {%endfor%}
+  <br>
+  <p>COMPLETED</p>
+  {%for bug in complete_bugs %}
+  <div id="a_bug">
+    <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p>
+    <p>{{ bug.bug_summary }}</p>
+  </div> 
+  {%endfor%}
+{% endblock %}

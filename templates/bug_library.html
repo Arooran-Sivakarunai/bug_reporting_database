@@ -5,5 +5,11 @@
 {% endblock %}
 {% block pagetitle %}<p>Bug Library</p>{% endblock %}
 {% block content %}
-    <p>Add This Functionality Later</p>
+  {%for bug in bugs %}
+  <div id="a_bug">
+    <p>{{ bug.bug_title }} + {{ bug.bug_id }}</p>
+    <p>{{ bug.bug_summary }}</p>
+    <p>{{ bug.priority }}</p>
+  </div> 
+  {%endfor%}
 {% endblock %}

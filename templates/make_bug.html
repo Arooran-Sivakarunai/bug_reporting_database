@@ -5,24 +5,21 @@
 {% endblock %}
 {% block pagetitle %}<p>Bug Creation Form</p>{% endblock %}
 {% block content %}
-<title>Make Bug</title>
-<form method="post">
-    <label for="reportNum">Report #:</label><br>
-    <input type="text" id="reportNum" name="reportNum"><br>
+<title>Create Bugs</title>
+    <form method="post">
+        <label for="bug_title">Bug Title:</label><br>
+        <input type="text" id="bug_title" name="bug_title"><br>
+        <label for="bug_info">Information:</label><br>
+        <input type="text" id="bug_info" name="bug_info">
 
-    <label for="bugType">Type of Bug:</label><br>
-    <input type="text" id="username" name="username"><br>
+        <p>Priority?</p>
+        <input type="radio" name="options" id="Low" value="Low"> Low </input>
+        <input type="radio" name="options" id="Medium" value="Medium"> Medium </input>
+        <input type="radio" name="options" id="High" value="High"> High </input>
+        <br>
 
-    <label for="bugSummary">Summary of Bug:</label><br>
-    <input type="text" id="bugSummary" name="bugSummary"><br>
-
-    <label for="updateNotifs">Updates on bug</label><br>
-    <input type="radio" id="updateNotifs" name="updateNotifs"><br>
-
-    <label for="updateProgress">Updates on progress</label><br>
-    <input type="radio" id="updateProgress" name="updateProgress"><br>
-</form> 
-<button>Save & Exit</button>
-<button>SUBMIT</button>
-<button>Close</button>
+        <button type="submit" name="Save" value="Save & Exit">Save & Exit</button>
+        <button type="submit" name="Submit" value="Submit To Database">Submit To Database</button>
+        <button type="submit" name="Cancel" value="Cancel">Cancel</button>
+    </form>
 {% endblock %}
